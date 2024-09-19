@@ -61,11 +61,13 @@ public class WordCountPulsar {
     private static PulsarSource<String> getPulsarSource(ParameterTool params)
             throws JsonProcessingException, FileNotFoundException {
 
+        String clusterName = params.get("clusterName");
+
         Map<String, String> env = System.getenv();
-        String serviceUrl = env.get("brokerServiceURL");
-        String adminUrl = env.get("webServiceURL");
-        String authPlugin = env.get("authPlugin");
-        String authParams = env.get("authParams");
+        String serviceUrl = env.get("SN_WORKSPACE_PULSAR_SERVICEURL_" + clusterName);
+        String adminUrl = env.get("SN_WORKSPACE_PULSAR_WEBSERVICEURL_" + clusterName);
+        String authPlugin = env.get("SN_WORKSPACE_AUTH_PLUGIN_" + clusterName);
+        String authParams = env.get("SN_WORKSPACE_AUTH_PARAMS_" + clusterName);
         String topicName = params.get("topic");
         String subscriptionName = params.get("subName");
 
