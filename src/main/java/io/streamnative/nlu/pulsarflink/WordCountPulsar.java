@@ -14,6 +14,7 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.util.Collector;
+import org.apache.flink.util.StringUtils;
 import org.apache.pulsar.shade.com.fasterxml.jackson.core.JsonProcessingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,18 +69,21 @@ public class WordCountPulsar {
         String adminUrl = env.get("SN_WORKSPACE_PULSAR_WEBSERVICEURL_" + clusterName);
         String authPlugin = env.get("SN_WORKSPACE_AUTH_PLUGIN_" + clusterName);
         String authParams = env.get("SN_WORKSPACE_AUTH_PARAMS_" + clusterName);
+        if (StringUtils.isNullOrWhitespaceOnly(clusterName)) {
+            serviceUrl = env.get("SN_WORKSPACE_PULSAR_SERVICEURL");
+            adminUrl = env.get("SN_WORKSPACE_PULSAR_WEBSERVICEURL");
+            authPlugin = env.get("SN_WORKSPACE_AUTH_PLUGIN");
+            authParams = env.get("SN_WORKSPACE_AUTH_PARAMS");
+        }
         String topicName = params.get("topic");
         String subscriptionName = params.get("subName");
 
         return PulsarSource.builder()
                 .setServiceUrl(serviceUrl)
-//                .setAdminUrl(adminUrl)
                 .setStartCursor(StartCursor.earliest())
                 .setTopics(topicName)
-                //.setDeserializationSchema(PulsarDeserializationSchema.flinkSchema(new SimpleStringSchema()))
                 .setDeserializationSchema(new SimpleStringSchema())
                 .setSubscriptionName(subscriptionName)
-
                 .setConfig(PulsarOptions.PULSAR_AUTH_PLUGIN_CLASS_NAME, authPlugin)
                 .setConfig(PulsarOptions.PULSAR_AUTH_PARAMS, authParams)
                 .build();
